@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Modal from '@mui/material/Modal';
 import Axios from '../../utils/Axios';
 import TextField from '@mui/material/TextField';
@@ -9,10 +9,10 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import moment from 'moment';
-import { ToastContainer, toast } from 'react-toastify';
+
 
 function ModalForm(props) {
-  const { open, handleClose, getAllSongs, update, selection, songs } = props;
+  const { open, handleClose, getAllSongs, updateSong, selection, songs, handleToastNotification } = props;
 
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
@@ -23,7 +23,7 @@ function ModalForm(props) {
   let index = 0;
 
   useEffect(() => {
-    if (update) {
+    if (updateSong) {
       index = songs.findIndex((song) => song.id === selection[0]);
 
       setTitle(songs[index].title);
@@ -44,7 +44,7 @@ function ModalForm(props) {
   //   // add any field validation here
   // }
 
-  const addSong = async () => {
+  const handleAddSong = async () => {
     let newSong = {
       title: title,
       artist: artist,
@@ -60,28 +60,12 @@ function ModalForm(props) {
       setAlbum('');
       setDate(moment(new Date()).format('YYYY-MM-DD'));
       setGenre('');
-      toast.success('Song was added!', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      handleToastNotification('success', 'Song was added!')
     } catch (e) {
-      return toast.error(e.message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      return handleToastNotification('error', e.message)
     }
   };
-  const updateSong = async () => {
+  const handleUpdateSong = async () => {
     let updatedSong = {
       title: title,
       artist: artist,
@@ -97,38 +81,22 @@ function ModalForm(props) {
       setAlbum('');
       setDate(moment(new Date()).format('YYYY-MM-DD'));
       setGenre('');
-      toast.success('Song was updated!', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      handleToastNotification('success', 'Song was updated!')
     } catch (e) {
-      return toast.error(e.message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      return handleToastNotification('error', e.message)
     }
   };
 
   const handleOnSubmit = () => {
-    if (update) {
-      updateSong();
+    if (updateSong) {
+      handleUpdateSong();
     } else {
-      addSong();
+      handleAddSong();
     }
     handleClose();
   };
 
-  const style = {
+  const styleForMuiBox = {
     position: 'absolute',
     top: '35%',
     left: '50%',
@@ -142,11 +110,9 @@ function ModalForm(props) {
   };
 
   return (
-    <>
-      {' '}
-      <ToastContainer />
+    <Fragment>
       <Modal open={open} onClose={handleClose}>
-        <Box sx={style}>
+        <Box sx={styleForMuiBox}>
           <Typography style={{ fontSize: '2rem', textAlign: 'center' }}>
             {(selection && selection.length > 0 && 'Update Song') ||
               'Add New Song'}
@@ -167,18 +133,21 @@ function ModalForm(props) {
               onChange={(e) => setTitle(e.target.value)}
             />
             <TextField
+              name='artist'
               label='artist'
               variant='standard'
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
             />
             <TextField
+              name='album'
               label='album'
               variant='standard'
               value={album}
               onChange={(e) => setAlbum(e.target.value)}
             />
             <TextField
+              name='genre'
               label='genre'
               variant='standard'
               value={genre}
@@ -209,7 +178,7 @@ function ModalForm(props) {
           </Typography>
         </Box>
       </Modal>
-    </>
+    </Fragment>
   );
 }
 

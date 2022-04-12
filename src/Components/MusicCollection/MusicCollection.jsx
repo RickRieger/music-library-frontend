@@ -8,11 +8,11 @@ import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-function MusicCollection() {
+function MusicCollection({ handleToastNotification }) {
   const [songs, setSongs] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [open, setOpen] = useState(false);
-  const [update, setUpdate] = useState(false);
+  const [updateSong, setUpdateSong] = useState(false);
   const [selection, setSelection] = useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -20,22 +20,14 @@ function MusicCollection() {
   useEffect(() => {
     getAllSongs();
     setUpdateTable(false);
-  }, [updateTable, update]);
+  }, [updateTable, updateSong]);
 
   const getAllSongs = async () => {
     try {
       const res = await Axios.get('/music/');
       setSongs(res.data);
     } catch (e) {
-      return toast.error(e.message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      return handleToastNotification('error', e.message);
     }
   };
   const deleteSongs = async () => {
@@ -45,39 +37,15 @@ function MusicCollection() {
       });
       await getAllSongs();
       setUpdateTable(true);
-      toast.success('Songs have been deleted!', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      handleToastNotification('success', 'Song(s) have been deleted.');
     } catch (e) {
-      return toast.error(e.message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      return handleToastNotification('error', e.message);
     }
   };
 
   const handleDelete = () => {
     if (!selection || selection.length < 1) {
-      return toast.error('You need to make a selection!', {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      return handleToastNotification('error', 'You need to make a selection!');
     }
 
     confirmAlert({
@@ -96,8 +64,6 @@ function MusicCollection() {
       ],
     });
   };
-
-
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -151,33 +117,19 @@ function MusicCollection() {
             variant='contained'
             onClick={() => {
               if (!selection) {
-                return toast.error(
-                  'Please make a single selection to update!',
-                  {
-                    position: 'top-center',
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  }
+                handleToastNotification(
+                  'error',
+                  'Please make a single selection to update!'
                 );
+                return;
               } else if (selection.length > 1) {
-                return toast.error(
-                  'Please make only one selection at a time!',
-                  {
-                    position: 'top-center',
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  }
+                handleToastNotification(
+                  'error',
+                  'Please make only one selection at a time!'
                 );
+                return;
               }
-              setUpdate(true);
+              setUpdateSong(true);
               handleOpen();
             }}
           >
@@ -189,16 +141,17 @@ function MusicCollection() {
         </Stack>
         <ModalForm
           open={open}
-          update={update}
+          updateSong={updateSong}
+          setUpdateSong={setUpdateSong}
           selection={selection}
-          setUpdate={setUpdate}
           handleClose={() => {
             handleClose();
-            setUpdate(false);
+            setUpdateSong(false);
           }}
           getAllSongs={getAllSongs}
           songs={songs}
           toast={toast}
+          handleToastNotification={handleToastNotification}
         />
       </Fragment>
     );
