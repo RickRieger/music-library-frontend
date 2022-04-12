@@ -10,29 +10,59 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import moment from 'moment';
 
+let initialValue = {
+  title: '',
+  artist: '',
+  album: '',
+  release_date: moment(new Date()).format('YYYY-MM-DD'),
+  genre: '',
+}
 
 function ModalForm(props) {
-  const { open, handleClose, getAllSongs, updateSong, selection, songs, handleToastNotification } = props;
+  const {
+    open,
+    handleClose,
+    getAllSongs,
+    updateSong,
+    selection,
+    songs,
+    handleToastNotification,
+  } = props;
 
-  const [title, setTitle] = useState('');
-  const [artist, setArtist] = useState('');
-  const [album, setAlbum] = useState('');
-  const [date, setDate] = useState(moment(new Date()).format('YYYY-MM-DD'));
-  const [genre, setGenre] = useState('');
+  // const [initialValue, setInitialValue] = useState({
+  //   title: '',
+  //   artist: '',
+  //   album: '',
+  //   date: moment(new Date()).format('YYYY-MM-DD'),
+  //   genre: '',
+  // });
+
+  const [values, setValues] = useState(initialValue)
+
+
+  const [title, setTitle] = useState(initialValue.title);
+  const [artist, setArtist] = useState(initialValue.artist);
+  const [album, setAlbum] = useState(initialValue.album);
+  const [date, setDate] = useState(initialValue.date);
+  const [genre, setGenre] = useState(initialValue.genre);
 
   let index = 0;
 
   useEffect(() => {
     if (updateSong) {
-      index = songs.findIndex((song) => song.id === selection[0]);
+       index = songs.findIndex((song) => song.id === selection[0]);
+      let selectedRecord = songs[index]
+        console.log("Record: ", selectedRecord)
+        setValues({...selectedRecord})
 
-      setTitle(songs[index].title);
-      setArtist(songs[index].artist);
-      setAlbum(songs[index].album);
-      setDate(songs[index].release_date);
-      setGenre(songs[index].genre);
-    }
-  }, [props]);
+  //     setTitle(songs[index].title);
+  //     setArtist(songs[index].artist);
+  //     setAlbum(songs[index].album);
+  //     setDate(songs[index].release_date);
+  //     setGenre(songs[index].genre);
+     }
+   }, [props]);
+
 
   // Deal with changes to ANY field on the form
   // const handleInputChange = (event) => {
@@ -43,6 +73,20 @@ function ModalForm(props) {
   //   })
   //   // add any field validation here
   // }
+
+  const handleUpdateFieldsChange = (e) => {
+    const { name, value } = e.target;
+
+    setValues({
+      ...values,
+      [name]: value,
+    });
+
+
+    // initialValue[name] = value
+
+    console.log(values)
+  };
 
   const handleAddSong = async () => {
     let newSong = {
@@ -60,9 +104,9 @@ function ModalForm(props) {
       setAlbum('');
       setDate(moment(new Date()).format('YYYY-MM-DD'));
       setGenre('');
-      handleToastNotification('success', 'Song was added!')
+      handleToastNotification('success', 'Song was added!');
     } catch (e) {
-      return handleToastNotification('error', e.message)
+      return handleToastNotification('error', e.message);
     }
   };
   const handleUpdateSong = async () => {
@@ -81,9 +125,9 @@ function ModalForm(props) {
       setAlbum('');
       setDate(moment(new Date()).format('YYYY-MM-DD'));
       setGenre('');
-      handleToastNotification('success', 'Song was updated!')
+      handleToastNotification('success', 'Song was updated!');
     } catch (e) {
-      return handleToastNotification('error', e.message)
+      return handleToastNotification('error', e.message);
     }
   };
 
@@ -130,7 +174,7 @@ function ModalForm(props) {
               label='song title'
               variant='standard'
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => handleUpdateFieldsChange(e)}
             />
             <TextField
               name='artist'
