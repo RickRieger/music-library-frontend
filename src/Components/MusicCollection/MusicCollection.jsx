@@ -7,13 +7,13 @@ import ModalForm from '../ModalForm/ModalForm';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
-
+import axios from 'axios';
 function MusicCollection({ handleToastNotification }) {
   const [songs, setSongs] = useState([]);
   const [updateTable, setUpdateTable] = useState(false);
   const [open, setOpen] = useState(false);
   const [updateSong, setUpdateSong] = useState(false);
-  const [selection, setSelection] = useState(null);
+  const [selection, setSelection] = useState([]);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -116,7 +116,8 @@ function MusicCollection({ handleToastNotification }) {
           <Button
             variant='contained'
             onClick={() => {
-              if (!selection) {
+              console.log(selection);
+              if (selection.length === 0) {
                 handleToastNotification(
                   'error',
                   'Please make a single selection to update!'

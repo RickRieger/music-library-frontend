@@ -10,14 +10,6 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import moment from 'moment';
 
-let initialValue = {
-  title: '',
-  artist: '',
-  album: '',
-  release_date: moment(new Date()).format('YYYY-MM-DD'),
-  genre: '',
-}
-
 function ModalForm(props) {
   const {
     open,
@@ -29,6 +21,15 @@ function ModalForm(props) {
     handleToastNotification,
   } = props;
 
+  let initialValue = {
+    title: '',
+    artist: '',
+    album: '',
+    release_date: moment(new Date()).format('YYYY-MM-DD'),
+    genre: '',
+  };
+
+  // console.log({...initialValue})
   // const [initialValue, setInitialValue] = useState({
   //   title: '',
   //   artist: '',
@@ -37,33 +38,40 @@ function ModalForm(props) {
   //   genre: '',
   // });
 
-  const [values, setValues] = useState(initialValue)
+  const [values, setValues] = useState({
+    title: 'lol',
+    artist: '',
+    album: '',
+    release_date: moment(new Date()).format('YYYY-MM-DD'),
+    genre: '',
+  });
 
-
-  const [title, setTitle] = useState(initialValue.title);
-  const [artist, setArtist] = useState(initialValue.artist);
-  const [album, setAlbum] = useState(initialValue.album);
-  const [date, setDate] = useState(initialValue.date);
-  const [genre, setGenre] = useState(initialValue.genre);
+  console.log(values);
+  const [title, setTitle] = useState(values.title);
+  const [artist, setArtist] = useState(values.artist);
+  const [album, setAlbum] = useState(values.album);
+  const [date, setDate] = useState(values.date);
+  const [genre, setGenre] = useState(values.genre);
 
   let index = 0;
 
   useEffect(() => {
     if (updateSong) {
-       index = songs.findIndex((song) => song.id === selection[0]);
-      let selectedRecord = songs[index]
-        console.log("Record: ", selectedRecord)
-        setValues({...selectedRecord})
+      index = songs.findIndex((song) => song.id === selection[0]);
+      let selectedRecord = songs[index];
+      console.log('Record: ', {...selectedRecord});
+      setValues({...initialValue,...selectedRecord});
+      
 
-  //     setTitle(songs[index].title);
-  //     setArtist(songs[index].artist);
-  //     setAlbum(songs[index].album);
-  //     setDate(songs[index].release_date);
-  //     setGenre(songs[index].genre);
-     }
-   }, [props]);
+          setTitle(songs[index].title);
+          setArtist(songs[index].artist);
+          setAlbum(songs[index].album);
+          setDate(songs[index].release_date);
+          setGenre(songs[index].genre);
+    }
+  }, [props, setValues]);
 
-
+  console.log(values);
   // Deal with changes to ANY field on the form
   // const handleInputChange = (event) => {
   //   const { name, value } = event.target
@@ -76,16 +84,14 @@ function ModalForm(props) {
 
   const handleUpdateFieldsChange = (e) => {
     const { name, value } = e.target;
-
+    console.log(e);
     setValues({
-      ...values,
       [name]: value,
     });
 
-
     // initialValue[name] = value
 
-    console.log(values)
+    console.log(values);
   };
 
   const handleAddSong = async () => {
@@ -152,7 +158,7 @@ function ModalForm(props) {
     boxShadow: 24,
     p: 4,
   };
-
+  console.log(title);
   return (
     <Fragment>
       <Modal open={open} onClose={handleClose}>
@@ -174,7 +180,9 @@ function ModalForm(props) {
               label='song title'
               variant='standard'
               value={title}
-              onChange={(e) => handleUpdateFieldsChange(e)}
+              onChange={(e) => {
+                setTitle(e.target.value)
+              }}
             />
             <TextField
               name='artist'
@@ -217,7 +225,7 @@ function ModalForm(props) {
               variant='contained'
               onClick={() => handleOnSubmit()}
             >
-              add
+              {updateSong?'update': 'add'}
             </Button>
           </Typography>
         </Box>
